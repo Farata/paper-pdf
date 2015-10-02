@@ -1,0 +1,124 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../paper-toolbar/paper-toolbar.html">
+<link rel="import" href="pdfjs-import.html">
+
+<!--
+An element that displays PDF documents. Based on Mozilla's PDF.js library.
+
+Example:
+
+    <paper-pdf src="path/to/document"></paper-pdf>
+
+@group Farata Elements
+@element paper-pdf
+@demo demo/index.html
+@hero hero.svg
+-->
+<dom-module id="paper-pdf">
+
+  <template>
+    <style>
+      :host {
+        display: block;
+        box-sizing: border-box;
+        height: 100%;
+      }
+
+      paper-header-panel {
+        background-color: var(--paper-pdf-background-color, --paper-grey-50);
+      }
+
+      #container {
+        padding-top: 6px;
+      }
+
+      .pdfViewer .page {
+        border: none;
+        margin: 6px auto 0;
+        @apply(--shadow-elevation-2dp);
+      }
+
+      .pdfViewer .page:first-child {
+        margin-top: 0;
+      }
+
+      .pdfViewer .page:last-child {
+        margin-bottom: 6px;
+      }
+    </style>
+
+    <paper-header-panel>
+      <paper-toolbar>
+        <span class="title">[[title]]</span>
+      </paper-toolbar>
+      <div id="container">
+        <div id="viewer" class="pdfViewer"></div>
+      </div>
+    </paper-header-panel>
+
+  </template>
+
+</dom-module>
+
+<script>
+
+  Polymer({
+
+    is: 'paper-pdf',
+
+    properties: {
+
+      /**
+       * `src` specifies URL to load a PDF document.
+       */
+      src: {
+        type: String,
+        value: 'demo/demo.pdf'
+      }
+
+    },
+
+    listeners: {
+      'container.pagesinit': '_onPagesInit'
+    },
+
+    ready: function () {
+      PDFJS.workerSrc = '../../pdfjs-dist/build/pdf.worker.js';
+
+      this.title = 'demo.pdf';
+    },
+
+    attached: function () {
+      this.observer = new MutationObserver(this._onPagesAdded.bind(this));
+      this.observer.observe(this.$.viewer, {childList: true});
+      this.viewer = new PDFJS.PDFViewer({container: this.$.container});
+
+      PDFJS.getDocument(this.src).then(function (document) {
+        this.viewer.setDocument(document);
+      }.bind(this));
+    },
+
+    _onPagesInit: function () {
+      //this.viewer.currentScaleValue = 'page-width';
+    },
+
+    /**
+     * The callback invoked every time a new page is added to the viewer.
+     * @param {Array<MutationRecord>} mutations
+     */
+    _onPagesAdded: function (mutations) {
+      mutations.forEach(function (record) {
+        for (var i = 0; i < record.addedNodes.length; i++) {
+          record.addedNodes[i].classList.add(this.is);
+        }
+      }.bind(this));
+    },
+
+    detached: function() {
+      this.observer.disconnect();
+    }
+
+  });
+
+</script>

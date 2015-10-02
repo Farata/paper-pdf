@@ -1,0 +1,30 @@
+{
+  "name": "paper-pdf",
+  "version": "1.0.0",
+  "authors": [
+    "Anonymous <anonymous@example.com>"
+  ],
+  "description": "An element providing a solution to no problem in particular.",
+  "keywords": [
+    "web-component",
+    "polymer",
+    "seed"
+  ],
+  "main": "paper-pdf.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/Farata/paper-pdf",
+  "ignore": [
+    "/.*",
+    "/test/"
+  ],
+  "dependencies": {
+    "pdfjs-dist": "mozilla/pdfjs-dist#~1.1.494",
+    "polymer": "Polymer/polymer#^1.1.0",
+    "paper-header-panel": "PolymerElements/paper-header-panel#~1.0.5",
+    "paper-toolbar": "PolymerElements/paper-toolbar#~1.0.4"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "*"
+  }
+}
