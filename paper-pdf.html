@@ -4,13 +4,13 @@
 <link rel="import" href="pdfjs-import.html">
 
 <!--
-An element providing a solution to no problem in particular.
+An element that displays PDF documents. Based on Mozilla's PDF.js library.
 
 Example:
 
-    <paper-pdf></paper-pdf>
+    <paper-pdf src="path/to/document"></paper-pdf>
 
-@group Seed Elements
+@group Farata Elements
 @element paper-pdf
 @demo demo/index.html
 @hero hero.svg
@@ -80,7 +80,7 @@ Example:
     },
 
     listeners: {
-      'container.pagesinit': 'onPagesInit'
+      'container.pagesinit': '_onPagesInit'
     },
 
     ready: function () {
@@ -90,7 +90,7 @@ Example:
     },
 
     attached: function () {
-      this.observer = new MutationObserver(this.onPagesAdded.bind(this));
+      this.observer = new MutationObserver(this._onPagesAdded.bind(this));
       this.observer.observe(this.$.viewer, {childList: true});
       this.viewer = new PDFJS.PDFViewer({container: this.$.container});
 
@@ -99,14 +99,15 @@ Example:
       }.bind(this));
     },
 
-    onPagesInit: function () {
-//      this.viewer.currentScaleValue = 'page-width';
+    _onPagesInit: function () {
+      //this.viewer.currentScaleValue = 'page-width';
     },
 
     /**
-     * @param {MutationRecord[]} mutations
+     * The callback invoked every time a new page is added to the viewer.
+     * @param {Array<MutationRecord>} mutations
      */
-    onPagesAdded: function (mutations) {
+    _onPagesAdded: function (mutations) {
       mutations.forEach(function (record) {
         for (var i = 0; i < record.addedNodes.length; i++) {
           record.addedNodes[i].classList.add(this.is);
@@ -116,34 +117,6 @@ Example:
 
     detached: function() {
       this.observer.disconnect();
-    },
-
-    /**
-     * The `paper-pdf-lasers` event is fired whenever `fireLasers` is called.
-     *
-     * @event paper-pdf-lasers
-     * @detail {{sound: String}}
-     */
-
-    /**
-     * Sometimes it's just nice to say hi.
-     *
-     * @param {string} greeting A positive greeting.
-     * @return {string} The full greeting.
-     */
-    sayHello: function(greeting) {
-      var response = greeting || 'Hello World!';
-      return 'paper-pdf says, ' + response;
-    },
-
-    /**
-     * Attempt to destroy this element's enemies with a beam of light!
-     *
-     * Or, at least, dispatch an event in the vain hope that someone else will
-     * do the zapping.
-     */
-    fireLasers: function() {
-      this.fire('paper-pdf-lasers', {sound: 'Pew pew!'});
     }
 
   });
