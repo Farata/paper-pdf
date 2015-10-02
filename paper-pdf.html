@@ -1,4 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../paper-toolbar/paper-toolbar.html">
 <link rel="import" href="pdfjs-import.html">
 
 <!--
@@ -20,12 +22,40 @@ Example:
       :host {
         display: block;
         box-sizing: border-box;
+        height: 100%;
+      }
+
+      paper-header-panel {
+        background-color: var(--paper-pdf-background-color, --paper-grey-50);
+      }
+
+      #container {
+        padding-top: 6px;
+      }
+
+      .pdfViewer .page {
+        border: none;
+        margin: 6px auto 0;
+        @apply(--shadow-elevation-2dp);
+      }
+
+      .pdfViewer .page:first-child {
+        margin-top: 0;
+      }
+
+      .pdfViewer .page:last-child {
+        margin-bottom: 6px;
       }
     </style>
 
-    <div id="container">
-      <div class="pdfViewer"></div>
-    </div>
+    <paper-header-panel>
+      <paper-toolbar>
+        <span class="title">[[title]]</span>
+      </paper-toolbar>
+      <div id="container">
+        <div id="viewer" class="pdfViewer"></div>
+      </div>
+    </paper-header-panel>
 
   </template>
 
@@ -53,14 +83,16 @@ Example:
       'container.pagesinit': 'onPagesInit'
     },
 
-    created: function () {
+    ready: function () {
       PDFJS.workerSrc = '../../pdfjs-dist/build/pdf.worker.js';
+
+      this.title = 'demo.pdf';
     },
 
     attached: function () {
-      this.viewer = new PDFJS.PDFViewer({
-        container: this.$.container
-      });
+      this.observer = new MutationObserver(this.onPagesAdded.bind(this));
+      this.observer.observe(this.$.viewer, {childList: true});
+      this.viewer = new PDFJS.PDFViewer({container: this.$.container});
 
       PDFJS.getDocument(this.src).then(function (document) {
         this.viewer.setDocument(document);
@@ -68,17 +100,23 @@ Example:
     },
 
     onPagesInit: function () {
-      this.viewer.currentScaleValue = 'page-width';
+//      this.viewer.currentScaleValue = 'page-width';
+    },
+
+    /**
+     * @param {MutationRecord[]} mutations
+     */
+    onPagesAdded: function (mutations) {
+      mutations.forEach(function (record) {
+        for (var i = 0; i < record.addedNodes.length; i++) {
+          record.addedNodes[i].classList.add(this.is);
+        }
+      }.bind(this));
     },
 
     detached: function() {
-      // The analog to `attached`, `detached` fires when the element has been
-      // removed from a document.
-      //
-      // Use this to clean up anything you did in `attached`.
+      this.observer.disconnect();
     },
-
-    // Element Behavior
 
     /**
      * The `paper-pdf-lasers` event is fired whenever `fireLasers` is called.
